@@ -11,6 +11,19 @@ chat_rooms = {
     "happy": [],
     "motivated": []
 }
+def init_db():
+    conn = sqlite3.connect("database.db")
+    cursor = conn.cursor()
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS messages (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            emotion TEXT,
+            username TEXT,
+            message TEXT
+        )
+    """)
+    conn.commit()
+    conn.close()
 
 def generate_username():
     return "User" + str(random.randint(100, 999))
@@ -46,3 +59,4 @@ def chat(emotion):
 
 if __name__ == "__main__":
     app.run(debug=True)
+init_db()
