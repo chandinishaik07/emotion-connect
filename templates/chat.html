@@ -13,7 +13,8 @@
     <div class="chat-box">
         {% for msg in messages %}
             <div class="message">
-                <b>{{ msg[2] }}:</b> {{ msg[3] }}
+                <b>{{ msg[0] }}:</b> {{ msg[1] }}
+
             </div>
         {% endfor %}
     </div>

@@ -1,26 +1,19 @@
 from flask import Flask, render_template, request, redirect, session
-import sqlite3
 import random
 
 app = Flask(__name__)
 app.secret_key = "emotionconnectsecret"
 
+# In-memory storage
+chat_rooms = {
+    "stressed": [],
+    "anxious": [],
+    "happy": [],
+    "motivated": []
+}
+
 def generate_username():
     return "User" + str(random.randint(100, 999))
-
-def init_db():
-    conn = sqlite3.connect("database.db")
-    cursor = conn.cursor()
-    cursor.execute("""
-        CREATE TABLE IF NOT EXISTS messages (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            emotion TEXT,
-            username TEXT,
-            message TEXT
-        )
-    """)
-    conn.commit()
-    conn.close()
 
 @app.route('/')
 def home():
@@ -33,34 +26,23 @@ def emotions():
 @app.route('/chat/<emotion>', methods=['GET', 'POST'])
 def chat(emotion):
 
+    if emotion not in chat_rooms:
+        return "Invalid emotion", 404
+
     if "username" not in session:
         session["username"] = generate_username()
 
     username = session["username"]
 
-    conn = sqlite3.connect("database.db")
-    cursor = conn.cursor()
-
     if request.method == "POST":
         message = request.form.get("message")
-
         if message:
-            cursor.execute(
-                "INSERT INTO messages (emotion, username, message) VALUES (?, ?, ?)",
-                (emotion, username, message)
-            )
-            conn.commit()
-
-        conn.close()
+            chat_rooms[emotion].append((username, message))
         return redirect(f"/chat/{emotion}")
 
-    cursor.execute("SELECT * FROM messages WHERE emotion = ?", (emotion,))
-    messages = cursor.fetchall()
-    conn.close()
+    messages = chat_rooms[emotion]
 
     return render_template("chat.html", emotion=emotion, messages=messages, username=username)
 
-init_db()
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     app.run(debug=True)
