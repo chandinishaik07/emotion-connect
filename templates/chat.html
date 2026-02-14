@@ -1,17 +1,19 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chat Room</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
-<body>
+<body class="{{ emotion }}">
 
-    <h1>Emotion: {{ emotion }}</h1>
-    <h3>You are: {{ username }}</h3>
+    <h1>{{ emotion.capitalize() }} Room</h1>
+    <p class="quote" id="quote"></p>
+    <p>You are: <b>{{ username }}</b></p>
 
     <div class="chat-box">
         {% for msg in messages %}
-            <div class="message">
+            <div class="message {% if msg[2] == username %}my-msg{% endif %}">
                 <b>{{ msg[2] }}:</b> {{ msg[3] }}
             </div>
         {% endfor %}
@@ -25,18 +27,19 @@
     <br>
     <a href="/emotions"><button>Change Emotion</button></a>
 
-    <!-- Auto Refresh -->
     <script>
-        setInterval(function(){
-            fetch(window.location.href)
-                .then(response => response.text())
-                .then(html => {
-                    let parser = new DOMParser();
-                    let doc = parser.parseFromString(html, "text/html");
-                    let newMessages = doc.querySelector(".chat-box").innerHTML;
-                    document.querySelector(".chat-box").innerHTML = newMessages;
-                });
-        }, 4000);
+        const quotes = {
+            stressed: "This feeling is temporary. You are stronger than you think.",
+            anxious: "Take a deep breath. You are safe.",
+            happy: "Keep spreading your positivity.",
+            motivated: "You are capable of amazing things."
+        };
+
+        document.getElementById("quote").innerText = quotes["{{ emotion }}"];
+
+        setTimeout(function(){
+            window.location.reload();
+        }, 5000);
     </script>
 
 </body>
