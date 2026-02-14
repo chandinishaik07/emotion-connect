@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Chat Room</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+    <h1>Emotion: {{ emotion }}</h1>
+    <h3>You are: {{ username }}</h3>
+
+    <div class="chat-box">
+        {% for msg in messages %}
+            <div class="message">
+                <b>{{ msg[2] }}:</b> {{ msg[3] }}
+            </div>
+        {% endfor %}
+    </div>
+
+    <form method="POST">
+        <input type="text" name="message" placeholder="Type message..." required>
+        <button type="submit">Send</button>
+    </form>
+
+    <br>
+    <a href="/emotions"><button>Change Emotion</button></a>
+
+    <!-- Auto Refresh -->
+    <script>
+        setInterval(function(){
+            fetch(window.location.href)
+                .then(response => response.text())
+                .then(html => {
+                    let parser = new DOMParser();
+                    let doc = parser.parseFromString(html, "text/html");
+                    let newMessages = doc.querySelector(".chat-box").innerHTML;
+                    document.querySelector(".chat-box").innerHTML = newMessages;
+                });
+        }, 4000);
+    </script>
+
+</body>
+</html>
