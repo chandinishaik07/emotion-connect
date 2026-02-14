@@ -1,9 +1,6 @@
 from flask import Flask, render_template, request, redirect, session
 import sqlite3
 import random
-import os
-DB_PATH = os.path.join("/tmp", "database.db")
-
 
 app = Flask(__name__)
 app.secret_key = "emotionconnectsecret"
@@ -12,8 +9,7 @@ def generate_username():
     return "User" + str(random.randint(100, 999))
 
 def init_db():
-    conn = sqlite3.connect(DB_PATH)
-
+    conn = sqlite3.connect("database.db")
     cursor = conn.cursor()
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS messages (
@@ -42,8 +38,7 @@ def chat(emotion):
 
     username = session["username"]
 
-    conn = sqlite3.connect(DB_PATH)
-
+    conn = sqlite3.connect("database.db")
     cursor = conn.cursor()
 
     if request.method == "POST":
